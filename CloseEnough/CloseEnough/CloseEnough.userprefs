@@ -1,0 +1,20 @@
+﻿<Properties StartupItem="Assembly-CSharp.csproj">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\UserInterface.cs">
+    <Files>
+      <File FileName="Assets\Scripts\PlayerInRangeDetector.cs" Line="14" Column="70" />
+      <File FileName="Assets\Scripts\Human.cs" Line="10" Column="26" />
+      <File FileName="Assets\Scripts\ScareTarget.cs" Line="17" Column="24" />
+      <File FileName="Assets\Scripts\ScareTargetInRangeDetector.cs" Line="12" Column="45" NotebookId="1" />
+      <File FileName="Assets\Scripts\Player.cs" Line="2" Column="34" NotebookId="1" />
+      <File FileName="Assets\Scripts\Controller.cs" Line="24" Column="42" NotebookId="1" />
+      <File FileName="Assets\Scripts\FearBar.cs" Line="34" Column="54" NotebookId="1" />
+      <File FileName="Assets\Scripts\GameManager.cs" Line="79" Column="50" NotebookId="1" />
+      <File FileName="Assets\Scripts\UserInterface.cs" Line="19" Column="45" NotebookId="1" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
