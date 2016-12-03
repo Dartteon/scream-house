@@ -6,8 +6,9 @@ using UnityEngine.UI;
 public class FearBar : MonoBehaviour {
 	private ScareTarget scareTarget;
 	private Image barImage;
-	private Color startColor = new Color (0f, 1f, 0f);
-	private Color endColor = new Color (1f, 0f, 0f);
+	private Color unripeColor = new Color (0f, 0f, 1f);
+	private Color ripeColor = new Color (0f, 1f, 0f);
+	private Color overripeColor = new Color (1f, 0f, 0f);
 	private Text text;
 	private GameObject playerInRangeIndicator;
 
@@ -21,9 +22,14 @@ public class FearBar : MonoBehaviour {
 	void Update() {
 		float currFear = scareTarget.fearCount;
 		float maxFear = scareTarget.maximumFearThreshold;
+		float minFear = scareTarget.minimumFearThreshold;
 		float ratio = currFear / maxFear;
 		barImage.fillAmount = ratio;
-		barImage.color = Color.Lerp (startColor, endColor, ratio);
+		if (currFear >= maxFear) {
+			barImage.color = overripeColor;
+		} else {
+			barImage.color = (currFear > minFear) ? ripeColor : unripeColor;
+		}
 		text.text = scareTarget.currDistFromPlayer.ToString ();
 		if (ratio <= 0) {
 			gameObject.SetActive (false);

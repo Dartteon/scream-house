@@ -10,6 +10,10 @@ public class Controller : MonoBehaviour {
 	}
 
 	void Update() {
+		if (Input.GetKeyDown (KeyCode.Space)) {
+			Debug.Log ("Space pressed");
+			GameManager.SpacePressed ();
+		}
 		if (player == null) return;
 		float yDir = 0f;
 		float xDir = 0f;
@@ -20,8 +24,12 @@ public class Controller : MonoBehaviour {
 		Vector2 dir = new Vector2 (xDir, yDir);
 		player.SetMoveDirection (dir);
 
-		if (Input.GetKeyDown (KeyCode.Space)) {
-			player.ScareAllScareTargetsInRange ();
+		if (Input.GetKeyDown (KeyCode.P)) {
+			GameManager.TogglePause ();
+		}
+
+		if (Input.GetKeyDown (KeyCode.Minus)) {
+			GameManager.Restart ();
 		}
 	}
 }

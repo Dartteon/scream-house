@@ -17,7 +17,7 @@ public class ScareTargetInRangeDetector : MonoBehaviour {
 
 	void OnTriggerEnter2D(Collider2D col) {
 		ScareTarget p = col.GetComponent<ScareTarget> ();
-		if (p != null) {
+		if (p != null && !targetsInRange.Contains(p)) {
 			targetsInRange.Add (p);
 		}
 	}

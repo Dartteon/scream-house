@@ -21,33 +21,44 @@ public class Human : MonoBehaviour {
 	protected string ANIM_LEFTWARD_IDLE = "";
 
 	public enum Direction { UP, DOWN, LEFT, RIGHT }
-	protected Direction currDirection = Direction.DOWN;
+	public Direction currDirection;
 
-	public enum HumanState { IDLE, MOVING, SCARING, SCARED }
-	protected HumanState currState;
+	public enum HumanState { IDLE, MOVING, SCARING, SCARED, HARDSTUNNED }
+	public HumanState currState { get; private set; }
 
 	public virtual void Initialize() {
 
 	}
 
 	void Update() {
+		if (currState == HumanState.SCARING) return;
+		CallExtraUpdates ();
 		SetState ();
 		SetMovement ();
 		SetAnimations ();
-		CallExtraUpdates ();
 	}
 	protected virtual void CallExtraUpdates() {
 
 	}
+
+	protected void SetNextState (HumanState state) {
+		if (currState != state && currState != HumanState.SCARED
+			&& currState != HumanState.HARDSTUNNED) {
+			currState = state;
+		}
+	}
 	protected void SetState() {
 		if (moveDirection.magnitude > 0) {
-			currState = HumanState.MOVING;
+			SetNextState(HumanState.MOVING);
 		} else {
-			currState = HumanState.IDLE;
+			SetNextState(HumanState.IDLE);
 		}
 	}
 
 	protected void SetMovement() {
+		if (currState != HumanState.MOVING && currState != HumanState.IDLE) {
+			return;
+		}
 		Vector2 displacement2 = Time.deltaTime * moveSpeed * (moveDirection.normalized);
 		Vector3 displacement3 = new Vector3 (displacement2.x, displacement2.y, 0f);
 		transform.localPosition = transform.localPosition + displacement3;

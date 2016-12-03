@@ -3,6 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class ScareTarget : Human {
+	[SerializeField]
+	private Transform emojiPopupPrefab;
+
+	private AudioSource audio;
+	[SerializeField]
+	private AudioClip scaredSound;
+
 	public float fearCount { get; private set; }
 	public float fearGainRate { get; private set; }
 	public float minimumFearThreshold { get; private set; }
@@ -13,15 +20,22 @@ public class ScareTarget : Human {
 	private PlayerInRangeDetector playerInRangeDetector;
 	private FearBar fearBar;
 
-	private bool hasSightedPlayer;
+	public bool hasSightedPlayer { get; private set; }
+	public bool hasBeenScared { get; private set; }
+
+	private string ANIM_SCARETARGET_SCARED = "ScareTarget1Scared";
+	private string ANIM_SCARETARGET_HEART_ATTACK = "ScareTarget1HeartAttack";
+
 	private Player player;
 	//Maximum distance this needs to be from the player, to start accumulating fear
 	public float maximumPlayerDistance { get; private set; }
 
 	public void Initialize(Player player) {
-		fearGainRate = 80f;
+		audio = transform.GetComponent<AudioSource> ();
+		fearGainRate = GameSettings.fearGainRate;
 		maximumFearThreshold = 100f;
 		maximumPlayerDistance = GameSettings.scareAttackRange;
+		minimumFearThreshold = 75f;
 
 		this.player = player;
 		sightObject = transform.Find ("Sight");
@@ -29,35 +43,80 @@ public class ScareTarget : Human {
 		fearBar.Initialize (this);
 		playerInRangeDetector = transform.Find ("PlayerInRangeDetector").GetComponent<PlayerInRangeDetector> ();
 		playerInRangeDetector.Initialize (this);
+		transform.GetComponent<ScareTargetAI> ().Initialize (this);
 
-
-		//TODO: Change to correct anim names and sprite
-		ANIM_DOWNWARD_MOVING = "PlayerDownwardMoving";
-		ANIM_DOWNWARD_IDLE = "PlayerDownwardIdle";
-		ANIM_UPWARD_MOVING = "PlayerUpwardMoving";
-		ANIM_UPWARD_IDLE = "PlayerUpwardIdle";
-		ANIM_RIGHTWARD_MOVING = "PlayerRightwardMoving";
-		ANIM_RIGHTWARD_IDLE = "PlayerRightwardIdle";
-		ANIM_LEFTWARD_MOVING = "PlayerLeftwardMoving";
-		ANIM_LEFTWARD_IDLE = "PlayerLeftwardIdle";
+		ANIM_DOWNWARD_MOVING = "ScareTarget1DownwardMoving";
+		ANIM_DOWNWARD_IDLE = "ScareTarget1DownwardIdle";
+		ANIM_UPWARD_MOVING = "ScareTarget1UpwardMoving";
+		ANIM_UPWARD_IDLE = "ScareTarget1UpwardIdle";
+		ANIM_RIGHTWARD_MOVING = "ScareTarget1RightwardMoving";
+		ANIM_RIGHTWARD_IDLE = "ScareTarget1RightwardIdle";
+		ANIM_LEFTWARD_MOVING = "ScareTarget1LeftwardMoving";
+		ANIM_LEFTWARD_IDLE = "ScareTarget1LeftwardIdle";
 	}
 
-	public void TriggerScare() {
+	public void TriggerScare(int scareType) {
+		hasBeenScared = true;
 		if (currState != HumanState.SCARED && gameObject.activeInHierarchy) {
-			currState = HumanState.SCARED;
+			SetNextState(HumanState.SCARED);
+			Transform emojiPopup = Instantiate (emojiPopupPrefab, transform);
+			emojiPopup.transform.localPosition = new Vector3 (0f, 1.71f, -2f);
+			switch (scareType) {
+			case 0:
+				emojiPopup.GetComponent<EmojiPopup> ().ShowRandomScaredEmoji ();
+				audio.PlayOneShot (scaredSound);
+				anim.Play (ANIM_SCARETARGET_SCARED);
+				break;
+			case 1:
+				emojiPopup.GetComponent<EmojiPopup> ().ShowRandomNotScaredEmoji ();
+				anim.Play (ANIM_DOWNWARD_IDLE);
+				break;
+			case 2:
+				emojiPopup.GetComponent<EmojiPopup> ().ShowRandomHeartAttackEmoji ();
+				audio.PlayOneShot (scaredSound);
+				anim.Play (ANIM_SCARETARGET_HEART_ATTACK);
+				break;
+			case 3:
+				//Gr8 scare
+				emojiPopup.GetComponent<EmojiPopup> ().ShowRandomSuperScaredEmoji();
+				audio.PlayOneShot (scaredSound);
+				anim.Play (ANIM_SCARETARGET_SCARED);
+				break;
+			}
+
+			Invoke ("Disappear", 2f);
+			SetMoveDirection (Vector2.zero);
+			GameManager.NotifyDeath (this);
+		}
+	}
+
+	public void OnCollisionEnter2D(Collision2D col) {
+		if (hasSightedPlayer || hasBeenScared) return;
+		Player p = col.transform.GetComponent<Player> ();
+		if (p != null) {
+			GameManager.TriggerHeartAttack (this);
+			fearCount = maximumFearThreshold;
+			UserInterface.ShowTip (1);
+			/*
 			Vector2 playerPos = player.transform.position;
 			Vector2 currPos = transform.position;
-			float dist = (playerPos - currPos).magnitude;
-			float ratio = 1f - (dist / maximumPlayerDistance);
-			GameManager.TriggerScare (fearCount, ratio);
-			gameObject.SetActive (false);
+			Vector2 dir = currPos - playerPos;
+			SetMoveDirection (dir);
+			*/
 		}
 	}
 
 	public void TriggerPlayerSighted() {
-		if (!hasSightedPlayer) {
+		if (!hasSightedPlayer && !hasBeenScared) {
 			hasSightedPlayer = true;
-			Debug.LogError ("PLAYER SIGHTED!");
+			SetNextState(HumanState.HARDSTUNNED);
+			GameManager.PlayerSighted ();
+			Invoke ("Disappear", 2f);
+			anim.Play (ANIM_DOWNWARD_IDLE);
+			SetMoveDirection (Vector2.zero);
+			Transform emojiPopup = Instantiate (emojiPopupPrefab, transform);
+			emojiPopup.transform.localPosition = new Vector3 (0f, 1.71f, -2f);
+			emojiPopup.GetComponent<EmojiPopup> ().ShowRandomDisappointedEmoji ();
 		}
 	}
 
@@ -70,10 +129,17 @@ public class ScareTarget : Human {
 			Debug.LogError ("Player not set!");
 			return;
 		}
+		if (currState == HumanState.SCARED) {
+			return;
+		}
 		SetSightDirection ();
 		CheckPlayerAndAddFear ();
 	}
 	private void CheckPlayerAndAddFear() {
+		if (hasSightedPlayer || hasBeenScared) {
+			fearBar.gameObject.SetActive (false);
+			return;
+		}
 		if (playerInRangeDetector.isPlayerInFearRange) {
 			Vector2 playerPos = player.transform.position;
 			Vector2 currPos = transform.position;
@@ -82,8 +148,11 @@ public class ScareTarget : Human {
 			//Player close enough.. start gaining fear
 			float ratio = 1f - (dist / maximumPlayerDistance);
 			float fearToAdd = ratio * fearGainRate * Time.deltaTime;
+			if (fearToAdd < 0) fearToAdd = 0;
 			if (fearCount + fearToAdd >= maximumFearThreshold) {
 				fearCount = maximumFearThreshold;
+				GameManager.TriggerHeartAttack (this);
+				UserInterface.ShowTip (4);
 			} else {
 				fearCount += fearToAdd;
 			}
@@ -115,4 +184,9 @@ public class ScareTarget : Human {
 			break;
 		}
 	}
+
+	private void Disappear() {
+		gameObject.SetActive (false);
+	}
+
 }
