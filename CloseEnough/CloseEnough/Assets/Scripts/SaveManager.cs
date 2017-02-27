@@ -14,6 +14,7 @@ public class SaveManager : MonoBehaviour {
 		FileStream file = File.Create (Application.persistentDataPath + "/savedGames.gd");
 		bf.Serialize(file, savedGame);
 		file.Close();
+//		Debug.Log ("File saved!");
 	}
 
 	public static void Load() {
@@ -21,15 +22,26 @@ public class SaveManager : MonoBehaviour {
 			BinaryFormatter bf = new BinaryFormatter();
 			FileStream file = File.Open(Application.persistentDataPath + "/savedGames.gd", FileMode.Open);
 			SaveManager.savedGame = (GameSave)bf.Deserialize(file);
+			SaveManager.savedGame.Sort ();
 			file.Close();
 		}
 	}
 
-	public static void AttemptToSavePlayer () {
-		if (savedGame != null) {
-			savedGame = new GameSave ();
-		} else {
+	public static bool IsNewHighScore (int score) {
+		if (savedGame == null) return true;
+		else return savedGame.IsPlayerNewHighscore (score);
+	}
 
+	public static void AttemptToSavePlayer (int score, string name) {
+		if (savedGame != null) {
+			if (savedGame.IsPlayerNewHighscore (score)) {
+				savedGame.AttemptAddPlayer (name, score);
+				Save ();
+			}
+		} else {
+			savedGame = new GameSave ();
+			savedGame.AttemptAddPlayer (name, score);
+			Save ();
 		}
 	}
 }

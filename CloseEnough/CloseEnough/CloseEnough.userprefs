@@ -1,20 +1,22 @@
 ﻿<Properties StartupItem="Assembly-CSharp.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\SaveManager.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Player.cs">
     <Files>
-      <File FileName="Assets\Scripts\PlayerInRangeDetector.cs" Line="10" Column="29" />
-      <File FileName="Assets\Scripts\EmojiPopup.cs" Line="9" Column="52" />
-      <File FileName="Assets\Scripts\Player.cs" Line="17" Column="45" />
-      <File FileName="Assets\Scripts\ScareTargetInRangeDetector.cs" Line="15" Column="2" />
-      <File FileName="Assets\Scripts\ScareTarget.cs" Line="27" Column="2" />
-      <File FileName="Assets\Scripts\Controller.cs" Line="23" Column="42" NotebookId="1" />
-      <File FileName="Assets\Scripts\UserInterface.cs" Line="58" Column="3" NotebookId="1" />
-      <File FileName="Assets\Scripts\GameSettings.cs" Line="19" Column="1" NotebookId="1" />
-      <File FileName="Assets\Scripts\ScareTargetAI.cs" Line="21" Column="24" NotebookId="1" />
-      <File FileName="Assets\Scripts\Human.cs" Line="81" Column="25" NotebookId="1" />
-      <File FileName="Assets\Scripts\GameManager.cs" Line="5" Column="41" NotebookId="1" />
-      <File FileName="Assets\Scripts\GameSave.cs" Line="6" Column="1" NotebookId="1" />
-      <File FileName="Assets\Scripts\SaveManager.cs" Line="8" Column="3" NotebookId="1" />
+      <File FileName="Assets\Scripts\PlayerInRangeDetector.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\EmojiPopup.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\Player.cs" Line="22" Column="39" />
+      <File FileName="Assets\Scripts\ScareTargetInRangeDetector.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\ScareTarget.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\GameSave.cs" Line="29" Column="11" />
+      <File FileName="Assets\Scripts\SaveManager.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\Controller.cs" Line="8" Column="41" NotebookId="1" />
+      <File FileName="Assets\Scripts\UserInterface.cs" Line="1" Column="1" NotebookId="1" />
+      <File FileName="Assets\Scripts\GameSettings.cs" Line="1" Column="1" NotebookId="1" />
+      <File FileName="Assets\Scripts\ScareTargetAI.cs" Line="1" Column="1" NotebookId="1" />
+      <File FileName="Assets\Scripts\Human.cs" Line="1" Column="1" NotebookId="1" />
+      <File FileName="Assets\Scripts\GameManager.cs" Line="1" Column="1" NotebookId="1" />
+      <File FileName="Assets\Scripts\GameOverScreen.cs" Line="1" Column="1" NotebookId="1" />
+      <File FileName="Assets\Scripts\TitleScreen.cs" Line="10" Column="22" NotebookId="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

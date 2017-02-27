@@ -3,11 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Player : Human {
+	[SerializeField]
+	private AudioClip screamSound;
+
+	private AudioSource audio;
+
 	public float scareAttackRange { get; private set; }
 	private ScareTargetInRangeDetector scareTargetInRangeDetector;
 	private string ANIM_SCARING = "PlayerScaring";
 
 	public override void Initialize () {
+		audio = transform.GetComponent<AudioSource> ();
 		this.scareAttackRange = GameSettings.scareAttackRange;
 		scareTargetInRangeDetector = transform.Find ("ScareTargetInRangeDetector").GetComponent<ScareTargetInRangeDetector> ();
 		scareTargetInRangeDetector.Initialize (this);
@@ -27,6 +33,7 @@ public class Player : Human {
 
 	public void ScareAllScareTargetsInRange() {
 		if (currState == HumanState.SCARING) return;
+		audio.PlayOneShot (screamSound);
 		CameraManager.CameraShake (.2f, .5f);
 		List<ScareTarget> scareTargetsInRange = scareTargetInRangeDetector.targetsInRange;
 		GameManager.instance.TriggerScare (scareTargetsInRange);

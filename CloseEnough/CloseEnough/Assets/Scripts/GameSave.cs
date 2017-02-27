@@ -13,6 +13,8 @@ public class GameSave {
 	}
 
 	public bool IsPlayerNewHighscore(int score) {
+		if (highscorePlayers.Count <= maxNumberPlayers || highscorePlayers == null) return true;
+		Sort ();
 		SavedPlayer lowestPlayer = highscorePlayers [highscorePlayers.Count - 1];	//last
 		if (lowestPlayer.score < score) {
 			return true;
@@ -20,14 +22,25 @@ public class GameSave {
 		return false;
 	}
 	public bool AttemptAddPlayer (string playerName, int score) {
+		if (highscorePlayers.Count < maxNumberPlayers) {
+			highscorePlayers.Add (new SavedPlayer (score, playerName));
+			return true;
+		}
+		Sort ();
 		SavedPlayer lowestPlayer = highscorePlayers [highscorePlayers.Count - 1];	//last
 		if (lowestPlayer.score < score) {
 			highscorePlayers.Add (new SavedPlayer (score, playerName));
-			highscorePlayers.Sort ((x, y) => x.score.CompareTo (y.score));
+			highscorePlayers.Sort ((x, y) => y.score.CompareTo (x.score));
 			highscorePlayers.RemoveAt (highscorePlayers.Count - 1);
 			return true;
 		}
 		return false;
+	}
+
+	public void Sort() {
+//		Debug.Log ("Sorting");
+		if (highscorePlayers != null)
+			highscorePlayers.Sort ((x, y) => y.score.CompareTo (x.score));
 	}
 
 
@@ -48,6 +61,7 @@ public class GameSave {
 }
 
 
+[System.Serializable]
 public class SavedPlayer {
 	public int score;
 	public string name;

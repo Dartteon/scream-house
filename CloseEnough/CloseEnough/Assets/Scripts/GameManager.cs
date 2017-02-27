@@ -11,6 +11,10 @@ public class GameManager : MonoBehaviour {
 	private Transform playerPrefab;
 	[SerializeField]
 	private Transform scareTargetPrefab;
+	[SerializeField]
+	private AudioClip coinSound;
+
+	private AudioSource audio;
 
 	private Player player;
 	private List<ScareTarget> scareTargets = new List<ScareTarget>();
@@ -54,6 +58,7 @@ public class GameManager : MonoBehaviour {
 			//At end game screen
 			instance.currState = GameState.PreGame;
 			instance.transform.Find ("TitleScreen").gameObject.SetActive (true);
+			instance.transform.Find ("TitleScreen").GetComponent<TitleScreen>().SetHighscoreBoard ();
 			instance.transform.Find ("GameOverScreen").gameObject.SetActive (false);
 			instance.transform.Find ("UserInterface").gameObject.SetActive (false);
 			instance.StartGame ();
@@ -64,10 +69,13 @@ public class GameManager : MonoBehaviour {
 		currState = GameState.PostGame;
 		Transform gameOverScreen = instance.transform.Find ("GameOverScreen");
 		gameOverScreen.gameObject.SetActive (true);
-		gameOverScreen.GetComponent<GameOverScreen> ().SetScore (currentScore);
+		bool isNewHighScore = SaveManager.IsNewHighScore (currentScore);
+		gameOverScreen.GetComponent<GameOverScreen> ().SetScore (currentScore, isNewHighScore);
 		instance.currentStage.gameObject.SetActive (false);
 		instance.transform.Find ("TitleScreen").gameObject.SetActive (false);
 		instance.transform.Find ("UserInterface").gameObject.SetActive (false);
+		instance.transform.Find ("TitleScreen").GetComponent<TitleScreen>().SetHighscoreBoard ();
+
 	}
 
 	private void ExtendTime (float duration, string description) {
@@ -105,10 +113,11 @@ public class GameManager : MonoBehaviour {
 	private void Initialize() {
 		currState = GameState.PreGame;
 		instance = this;
+		audio = transform.GetComponent<AudioSource> ();
 	}
 
 	private void StartGame() {
-		Debug.Log ("Game Started");
+//		Debug.Log ("Game Started");
 		currentStage = Instantiate (stagePrefabs [0], null);
 		SpawnPlayer ();
 		SpawnScareTargets ();
@@ -167,9 +176,11 @@ public class GameManager : MonoBehaviour {
 
 
 	void Start () {
+		SaveManager.Load ();
 		instance = this;
 		Initialize ();
 		SetController ();
+		instance.transform.Find ("TitleScreen").GetComponent<TitleScreen>().SetHighscoreBoard ();
 	}
 
 	public static void TriggerScare(float fearCount, float distanceRatio, bool isOverMinimumRequiredThreshold, ScareTarget scareTarget) {
@@ -245,9 +256,10 @@ public class GameManager : MonoBehaviour {
 		instance.currentScore += (int)pointReward;
 		int extraCombo = (numUnderwhelmingScares > 0 || numHeartAttacks > 0) ? 0 : numSuccessfulScares;
 		UserInterface.SetScore (instance.currentScore);
-		if ((int)pointReward > 0)
+		if ((int)pointReward > 0) {
+			audio.PlayOneShot (coinSound);
 			UserInterface.ShowScoreGain ((int)pointReward, extraCombo, (1 + (multiplierPerCombo * currentCombo)));
-
+		}
 		//Now set combos
 		if (numSuccessfulScares > 1) {
 			Debug.LogError ("TODO: Spawn MULTI call");
